@@ -6,7 +6,7 @@ import { DNSCryptInfo, GetUsedDNSServer } from './dns-servers'
 
 const router = Router()
 
-const MiddlewareJSONCheck = (request: Request) => {
+export const MiddlewareJSONCheck = (request: Request) => {
   const contentType = request.headers.get('content-type') || ''
   if (!contentType.includes('application/json')) {
     return JSONErrorResponse('Not a JSON Body', 400)
