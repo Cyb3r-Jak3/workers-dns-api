@@ -30,13 +30,13 @@ async function queryEndpoint(req) {
         query.server = dns_utils_1.DEFAULT_DOH_SERVER;
     }
     if (query.question === undefined || query.type === undefined) {
-        return utils_1.JSONErrorResponse("Need both'question', and 'type' set", 400);
+        return (0, utils_1.JSONErrorResponse)("Need both'question', and 'type' set", 400);
     }
-    const DNSResult = await dns_utils_1.DNSQuery(query);
+    const DNSResult = await (0, dns_utils_1.DNSQuery)(query);
     if (DNSResult.Status === -1) {
-        return utils_1.JSONErrorResponse('Error getting DNS Response');
+        return (0, utils_1.JSONErrorResponse)('Error getting DNS Response');
     }
-    return utils_1.JSONResponse(DNSResult);
+    return (0, utils_1.JSONResponse)(DNSResult);
 }
 exports.queryEndpoint = queryEndpoint;
 
@@ -70,7 +70,7 @@ async function GetUsedDNSServer() {
                 usedDNSServer.push(server);
             }
         });
-        response = utils_1.JSONResponse(usedDNSServer, undefined, [
+        response = (0, utils_1.JSONResponse)(usedDNSServer, undefined, [
             ['Cache-Control', 'max-age=43200, must-revalidate'],
         ]);
         cache.put(DNS_CRYPT_INFO_URL, response.clone());
@@ -87,9 +87,9 @@ async function DNSCRYPT_RESPONSE() {
         });
         if (result.status !== 200) {
             console.error(result.statusText);
-            return utils_1.JSONErrorResponse('Error getting upstream info');
+            return (0, utils_1.JSONErrorResponse)('Error getting upstream info');
         }
-        response = utils_1.JSONResponse(await result.json());
+        response = (0, utils_1.JSONResponse)(await result.json());
         cache.put(DNS_CRYPT_INFO_URL, response.clone());
     }
     return response;
@@ -135,6 +135,42 @@ async function DNSQuery(query) {
     return dnsResults;
 }
 exports.DNSQuery = DNSQuery;
+
+
+/***/ }),
+
+/***/ "./src/index.ts":
+/*!**********************!*\
+  !*** ./src/index.ts ***!
+  \**********************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MiddlewareJSONCheck = void 0;
+const dns_query_1 = __webpack_require__(/*! ./dns-query */ "./src/dns-query.ts");
+const itty_router_1 = __webpack_require__(/*! itty-router */ "./node_modules/itty-router/dist/itty-router.min.js");
+const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
+const dns_servers_1 = __webpack_require__(/*! ./dns-servers */ "./src/dns-servers.ts");
+const router = (0, itty_router_1.Router)();
+const MiddlewareJSONCheck = (request) => {
+    const contentType = request.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+        return (0, utils_1.JSONErrorResponse)('Not a JSON Body', 400);
+    }
+};
+exports.MiddlewareJSONCheck = MiddlewareJSONCheck;
+router.get('/', () => {
+    return new Response('Hello, world! This is the root page of your Worker template.');
+});
+router.get('/nameservers/used', dns_servers_1.GetUsedDNSServer);
+router.get('/nameservers/all', dns_servers_1.DNSCryptInfo);
+router.get('/query', exports.MiddlewareJSONCheck, dns_query_1.queryEndpoint);
+router.all('*', () => new Response('404, not found!', { status: 404 }));
+addEventListener('fetch', (e) => {
+    e.respondWith(router.handle(e.request));
+});
 
 
 /***/ }),
@@ -199,41 +235,12 @@ exports.JSONErrorResponse = JSONErrorResponse;
 /******/ 	}
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
-(() => {
-"use strict";
-var exports = __webpack_exports__;
-/*!**********************!*\
-  !*** ./src/index.ts ***!
-  \**********************/
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dns_query_1 = __webpack_require__(/*! ./dns-query */ "./src/dns-query.ts");
-const itty_router_1 = __webpack_require__(/*! itty-router */ "./node_modules/itty-router/dist/itty-router.min.js");
-const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
-const dns_servers_1 = __webpack_require__(/*! ./dns-servers */ "./src/dns-servers.ts");
-const router = itty_router_1.Router();
-const MiddlewareJSONCheck = (request) => {
-    const contentType = request.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-        return utils_1.JSONErrorResponse('Not a JSON Body', 400);
-    }
-};
-router.get('/', () => {
-    return new Response('Hello, world! This is the root page of your Worker template.');
-});
-router.get('/nameservers/used', dns_servers_1.GetUsedDNSServer);
-router.get('/nameservers/all', dns_servers_1.DNSCryptInfo);
-// router.get('/nameservers/info', nameServerInfo)
-router.get('/query', MiddlewareJSONCheck, dns_query_1.queryEndpoint);
-router.all('*', () => new Response('404, not found!', { status: 404 }));
-addEventListener('fetch', (e) => {
-    e.respondWith(router.handle(e.request));
-});
-
-})();
-
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __webpack_require__("./src/index.ts");
+/******/ 	
 /******/ })()
 ;
 //# sourceMappingURL=worker.js.map
