@@ -10,7 +10,9 @@ export async function DNSCryptInfo(): Promise<Response> {
 
 export async function GetUsedDNSServer(): Promise<Response> {
   const cache = caches.default
-  let response = await cache.match('https://dns-api.cyberjake.xyz/AvailableDNSServers')
+  let response = await cache.match(
+    'https://dns-api.cyberjake.xyz/AvailableDNSServers',
+  )
   if (!response) {
     const list: DNSCRYPT_RESOLVERS[] = await (await DNSCRYPT_RESPONSE()).json()
     const usedDNSServer: DNSCRYPT_RESOLVERS[] = []
