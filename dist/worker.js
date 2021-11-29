@@ -162,7 +162,7 @@ const MiddlewareJSONCheck = (request) => {
 };
 exports.MiddlewareJSONCheck = MiddlewareJSONCheck;
 router.get('/', () => {
-    return new Response('Hello, world! This is the root page of your Worker template.');
+    return new Response('Homepage for DNS API. Nothing here right now but there are other endpoints. Checkout the repo: https://github.com/Cyb3r-Jak3/workers-dns-api');
 });
 router.get('/nameservers/used', dns_servers_1.GetUsedDNSServer);
 router.get('/nameservers/all', dns_servers_1.DNSCryptInfo);
