@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack",
     "format": "prettier --write  *.{json,js} src/**/*.{js,ts} test/**/*.{js,ts}",
-    "lint": "eslint --max-warnings=0 src && prettier --check *.{json,js} src/**/*.{js,ts} test/**/*.{js,ts}",
+    "lint": "eslint --max-warnings=0 src/**.{js,ts} && prettier --check *.{json,js} src/**/*.{js,ts} test/**/*.{js,ts}",
     "test": "jest --config jestconfig.json --verbose"
   },
   "author": "cyb3rjak3",
@@ -38,6 +38,9 @@
     "webpack-cli": "^4.7.0"
   },
   "dependencies": {
-    "itty-router": "^2.4.5"
+    "@cloudflare/wrangler": "^1.19.6",
+    "itty-router": "^2.4.5",
+    "npa": "^0.1.1",
+    "wrangler": "^0.0.6"
   }
 }

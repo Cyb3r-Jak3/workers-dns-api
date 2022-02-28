@@ -9,24 +9,23 @@ export async function DNSCryptInfo(): Promise<Response> {
 }
 
 export async function GetUsedDNSServer(): Promise<Response> {
-  const cache = caches.default
-  let response = await cache.match(
-    'https://dns-api.cyberjake.xyz/AvailableDNSServers',
-  )
-  if (!response) {
+  let servers: DNSCRYPT_RESOLVERS[] | null = await KEYS.get('DoH_SERVERS', {
+    type: 'json',
+  })
+  if (servers === null) {
     const list: DNSCRYPT_RESOLVERS[] = await (await DNSCRYPT_RESPONSE()).json()
-    const usedDNSServer: DNSCRYPT_RESOLVERS[] = []
+    let usedDNSServer: DNSCRYPT_RESOLVERS[] = []
     list.forEach((server) => {
       if (server.nofilter && server.proto === 'DoH') {
         usedDNSServer.push(server)
       }
     })
-    response = JSONResponse(usedDNSServer, undefined, [
-      ['Cache-Control', 'max-age=43200, must-revalidate'],
-    ])
-    cache.put(DNS_CRYPT_INFO_URL, response.clone())
+    servers = usedDNSServer
+    await KEYS.put('DoH_SERVERS', JSON.stringify(usedDNSServer), {
+      expirationTtl: 86400,
+    })
   }
-  return response
+  return JSONResponse(servers)
 }
 
 async function DNSCRYPT_RESPONSE(): Promise<Response> {

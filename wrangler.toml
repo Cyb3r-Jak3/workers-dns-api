@@ -2,9 +2,15 @@ name = "dns-api"
 type = "javascript"
 zone_id = ""
 account_id = "8be772befd147a8df540aae0fa15c047"
-route = "dns.api.cyberjake.xyz"
+route = "dns.cyberjake.xyz/api/*"
 workers_dev = true
 compatibility_date = "2021-11-26"
+kv_namespaces = [
+    {binding = "KEYS", id = "4606ed33cd504ea99ebf3e212dc8e791", preview_id = "668bdc8b6b364db98a12dbf3c30cf48f"}
+]
+
+webpack_config = "webpack.config.js"
+
 
 [build]
 command = "npm install && npm run build"
