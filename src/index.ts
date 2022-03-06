@@ -4,7 +4,7 @@ import { Router } from 'itty-router'
 import { MiddlewareJSONCheck } from './utils'
 import { DNSCryptInfo, GetUsedDNSServer } from './dns-servers'
 
-const router = Router({base: "/api"})
+const router = Router({ base: '/api' })
 
 router.get('/', () => {
   return new Response(
