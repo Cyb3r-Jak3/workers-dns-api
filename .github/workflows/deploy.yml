@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'src/*'
+      - 'dist/*'
       - '.github/workflows/deploy.yml'
       - 'package.json'
     tags:
