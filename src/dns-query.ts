@@ -8,16 +8,24 @@ export interface QueryRequest {
 }
 
 export async function queryEndpoint(req: Request): Promise<Response> {
-  const query: QueryRequest = await req.json()
-  if (query.server === undefined) {
-    query.server = DEFAULT_DOH_SERVER
+  const cache = caches.default
+  let resp = await cache.match(req)
+  if (!resp) {
+    const query: QueryRequest = await req.json()
+    if (query.server === undefined) {
+      query.server = DEFAULT_DOH_SERVER
+    }
+    if (query.question === undefined || query.type === undefined) {
+      return JSONErrorResponse("Need both'question', and 'type' set", 400)
+    }
+    const DNSResult = await DNSQuery(query)
+    if (DNSResult.Status === -1) {
+      return JSONErrorResponse('Error getting DNS Response')
+    }
+    resp = JSONResponse(DNSResult, 200, [
+      ['Cache-Control', DNSResult.Answer[0].TTL.toString()],
+    ])
+    await cache.put(req, resp.clone())
   }
-  if (query.question === undefined || query.type === undefined) {
-    return JSONErrorResponse("Need both'question', and 'type' set", 400)
-  }
-  const DNSResult = await DNSQuery(query)
-  if (DNSResult.Status === -1) {
-    return JSONErrorResponse('Error getting DNS Response')
-  }
-  return JSONResponse(DNSResult)
+  return resp
 }

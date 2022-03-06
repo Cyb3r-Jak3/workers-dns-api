@@ -1,17 +1,10 @@
 import { queryEndpoint } from './dns-query'
 
 import { Router } from 'itty-router'
-import { JSONErrorResponse } from './utils'
+import { MiddlewareJSONCheck } from './utils'
 import { DNSCryptInfo, GetUsedDNSServer } from './dns-servers'
 
 const router = Router()
-
-export const MiddlewareJSONCheck = (request: Request): Response | undefined => {
-  const contentType = request.headers.get('content-type') || ''
-  if (!contentType.includes('application/json')) {
-    return JSONErrorResponse('Not a JSON Body', 400)
-  }
-}
 
 router.get('/', () => {
   return new Response(

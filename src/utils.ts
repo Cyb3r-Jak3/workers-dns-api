@@ -20,3 +20,10 @@ export function JSONResponse(
 export function JSONErrorResponse(errMessage: string, status = 500): Response {
   return JSONResponse({ Error: errMessage }, status)
 }
+
+export const MiddlewareJSONCheck = (request: Request): Response | undefined => {
+  const contentType = request.headers.get('content-type') || ''
+  if (!contentType.includes('application/json')) {
+    return JSONErrorResponse('Not a JSON Body', 400)
+  }
+}

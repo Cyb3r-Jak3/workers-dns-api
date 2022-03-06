@@ -1,4 +1,8 @@
-import { JSONErrorResponse, JSONResponse } from '../src/utils'
+import {
+  JSONErrorResponse,
+  JSONResponse,
+  MiddlewareJSONCheck,
+} from '../src/utils'
 import makeServiceWorkerEnv from 'service-worker-mock'
 
 declare var global: any
@@ -22,5 +26,28 @@ describe('JSONResponse', () => {
     expect(result.headers.get('content-type')).toEqual(
       'application/json; charset=UTF-8',
     )
+  })
+})
+
+describe('Middleware Check', () => {
+  beforeEach(() => {
+    Object.assign(global, makeServiceWorkerEnv())
+    jest.resetModules()
+  })
+  test('Good check', async () => {
+    const result = MiddlewareJSONCheck(
+      new Request('/', { headers: { 'Content-Type': 'application/json' } }),
+    )
+    if (result) {
+      throw new Error('Got a respond for good middleware check result')
+    }
+  })
+
+  test('Fail check', async () => {
+    const result = MiddlewareJSONCheck(new Request('/'))
+    if (!result) {
+      throw new Error('Unable to get middleware check result')
+    }
+    expect(result.status).toEqual(400)
   })
 })

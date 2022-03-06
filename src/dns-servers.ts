@@ -8,24 +8,32 @@ export async function DNSCryptInfo(): Promise<Response> {
   return await DNSCRYPT_RESPONSE()
 }
 
-export async function GetUsedDNSServer(): Promise<Response> {
-  let servers: DNSCRYPT_RESOLVERS[] | null = await KEYS.get('DoH_SERVERS', {
-    type: 'json',
-  })
-  if (servers === null) {
-    const list: DNSCRYPT_RESOLVERS[] = await (await DNSCRYPT_RESPONSE()).json()
-    let usedDNSServer: DNSCRYPT_RESOLVERS[] = []
-    list.forEach((server) => {
-      if (server.nofilter && server.proto === 'DoH') {
-        usedDNSServer.push(server)
-      }
+export async function GetUsedDNSServer(req: Request): Promise<Response> {
+  const cache = caches.default
+  let resp = await cache.match(req)
+  if (!resp) {
+    let servers: DNSCRYPT_RESOLVERS[] | null = await KEYS.get('DoH_SERVERS', {
+      type: 'json',
     })
-    servers = usedDNSServer
-    await KEYS.put('DoH_SERVERS', JSON.stringify(usedDNSServer), {
-      expirationTtl: 86400,
-    })
+    if (servers === null) {
+      const list: DNSCRYPT_RESOLVERS[] = await (
+        await DNSCRYPT_RESPONSE()
+      ).json()
+      let usedDNSServer: DNSCRYPT_RESOLVERS[] = []
+      list.forEach((server) => {
+        if (server.nofilter && server.proto === 'DoH') {
+          usedDNSServer.push(server)
+        }
+      })
+      servers = usedDNSServer
+      await KEYS.put('DoH_SERVERS', JSON.stringify(usedDNSServer), {
+        expirationTtl: 86400,
+      })
+    }
+    resp = JSONResponse(servers, 200, [['Cache-Control', '86400']])
+    await cache.put(req, resp.clone())
   }
-  return JSONResponse(servers)
+  return resp
 }
 
 async function DNSCRYPT_RESPONSE(): Promise<Response> {
@@ -40,7 +48,7 @@ async function DNSCRYPT_RESPONSE(): Promise<Response> {
       return JSONErrorResponse('Error getting upstream info')
     }
     response = JSONResponse(await result.json())
-    cache.put(DNS_CRYPT_INFO_URL, response.clone())
+    await cache.put(DNS_CRYPT_INFO_URL, response.clone())
   }
   return response
 }
