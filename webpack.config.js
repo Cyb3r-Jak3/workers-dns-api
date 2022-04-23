@@ -7,7 +7,7 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
   },
   devtool: 'cheap-module-source-map',
-  mode: 'production',
+  mode: 'development',
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
   },

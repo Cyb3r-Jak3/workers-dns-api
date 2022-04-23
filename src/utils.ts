@@ -1,3 +1,4 @@
+import { BASE } from './index'
 export function JSONResponse(
   ResponseData: string | unknown,
   status = 200,
@@ -26,4 +27,8 @@ export const MiddlewareJSONCheck = (request: Request): Response | undefined => {
   if (!contentType.includes('application/json')) {
     return JSONErrorResponse('Not a JSON Body', 400)
   }
+}
+
+export function CleanBase(fullURL: string, stripPart: string): string {
+  return new URL(fullURL).pathname.replace(`${BASE}${stripPart}/`, '')
 }

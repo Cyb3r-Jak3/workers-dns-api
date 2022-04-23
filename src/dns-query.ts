@@ -1,6 +1,8 @@
 import { DNSQuery, DEFAULT_DOH_SERVER } from './dns-utils'
 import { JSONErrorResponse, JSONResponse } from './utils'
 
+const cache = caches.default
+
 export interface QueryRequest {
   server: string
   type: string
@@ -8,7 +10,6 @@ export interface QueryRequest {
 }
 
 export async function queryEndpoint(req: Request): Promise<Response> {
-  const cache = caches.default
   let resp = await cache.match(req)
   if (!resp) {
     const query: QueryRequest = await req.json()

@@ -1,6 +1,8 @@
 import { DNSCRYPT_RESOLVERS } from './dns-utils'
 import { JSONErrorResponse, JSONResponse } from './utils'
 
+const cache = caches.default
+
 const DNS_CRYPT_INFO_URL =
   'https://download.dnscrypt.info/dnscrypt-resolvers/json/public-resolvers.json'
 
@@ -9,10 +11,9 @@ export async function DNSCryptInfo(): Promise<Response> {
 }
 
 export async function GetUsedDNSServer(req: Request): Promise<Response> {
-  const cache = caches.default
   let resp = await cache.match(req)
   if (!resp) {
-    let servers: DNSCRYPT_RESOLVERS[] | null = await KEYS.get('DoH_SERVERS', {
+    let servers: DNSCRYPT_RESOLVERS[] | null = await KV.get('DoH_SERVERS', {
       type: 'json',
     })
     if (servers === null) {
@@ -26,7 +27,7 @@ export async function GetUsedDNSServer(req: Request): Promise<Response> {
         }
       })
       servers = usedDNSServer
-      await KEYS.put('DoH_SERVERS', JSON.stringify(usedDNSServer), {
+      await KV.put('DoH_SERVERS', JSON.stringify(usedDNSServer), {
         expirationTtl: 86400,
       })
     }
@@ -37,7 +38,6 @@ export async function GetUsedDNSServer(req: Request): Promise<Response> {
 }
 
 async function DNSCRYPT_RESPONSE(): Promise<Response> {
-  const cache = caches.default
   let response = await cache.match(DNS_CRYPT_INFO_URL)
   if (!response) {
     const result = await fetch(DNS_CRYPT_INFO_URL, {

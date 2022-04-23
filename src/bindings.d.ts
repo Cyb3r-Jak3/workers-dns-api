@@ -1,5 +1,6 @@
 export {}
 
 declare global {
-  const KEYS: KVNamespace
+  const KV: KVNamespace
+  const PRODUCTION: 'false' | 'true'
 }

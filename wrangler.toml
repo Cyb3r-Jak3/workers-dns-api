@@ -1,4 +1,4 @@
-name = "dns-api"
+name = "dns-api-dev"
 type = "javascript"
 zone_id = ""
 account_id = ""
@@ -6,7 +6,7 @@ route = "dns.cyberjake.xyz/api/*"
 workers_dev = true
 compatibility_date = "2021-11-26"
 kv_namespaces = [
-    {binding = "KEYS", id = "4606ed33cd504ea99ebf3e212dc8e791", preview_id = "668bdc8b6b364db98a12dbf3c30cf48f"}
+    {binding = "KV", id = "4606ed33cd504ea99ebf3e212dc8e791", preview_id = "668bdc8b6b364db98a12dbf3c30cf48f"}
 ]
 
 webpack_config = "webpack.config.js"
@@ -16,3 +16,14 @@ webpack_config = "webpack.config.js"
 command = "npm install && npm run build"
 [build.upload]
 format = "service-worker"
+
+[vars]
+PRODUCTION = "false"
+
+[env.production]
+name = "dns-api"
+kv_namespaces = [
+    { binding = "KV", id = "4606ed33cd504ea99ebf3e212dc8e791" }
+]
+[env.production.vars]
+PRODUCTION = "true"
