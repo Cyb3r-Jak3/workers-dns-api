@@ -181,7 +181,7 @@ async function GetRegistryRDAP(url: string, to_strip: string): Promise<RegistryR
   return await RDAPResponse.json()
 }
 
-export async function WHOIS(req: Request): Promise<Response> {
+export async function WHOISEndpoint(req: Request): Promise<Response> {
   let resp = await cache.match(req)
   if (!resp) {
     resp = JSONResponse(await getWHOISInfo(), 200, [['Cache-Control', '3600']])
@@ -190,7 +190,7 @@ export async function WHOIS(req: Request): Promise<Response> {
   return resp
 }
 
-export async function RegistryInfoURL(req: Request): Promise<Response> {
+export async function RegistryInfoURLEndpoint(req: Request): Promise<Response> {
   let resp = await cache.match(req)
   if (!resp) {
     const tld = CleanBase(req.url, 'registry')
@@ -211,7 +211,7 @@ export async function RegistryInfoURL(req: Request): Promise<Response> {
   return resp
 }
 
-export async function GetRegistryRDAPInfo(req: Request): Promise<Response> {
+export async function GetRegistryRDAPInfoEndpoint(req: Request): Promise<Response> {
   let resp = await cache.match(req)
   if (!resp) {
     const r = await GetRegistryRDAP(req.url, 'rdap/registry')
@@ -225,7 +225,7 @@ export async function GetRegistryRDAPInfo(req: Request): Promise<Response> {
 }
 
 
-export async function GetRegistrarRDAP(req: Request): Promise<Response> {
+export async function GetRegistrarRDAPEndpoint(req: Request): Promise<Response> {
   let resp = await cache.match(req)
   if (!resp){
     const rdap_data = await GetRegistryRDAP(req.url, 'rdap/registrar')

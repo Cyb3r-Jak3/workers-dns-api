@@ -6,11 +6,11 @@ const cache = caches.default
 const DNS_CRYPT_INFO_URL =
   'https://download.dnscrypt.info/dnscrypt-resolvers/json/public-resolvers.json'
 
-export async function DNSCryptInfo(): Promise<Response> {
+export async function DNSCryptInfoEndpoint(): Promise<Response> {
   return await DNSCRYPT_RESPONSE()
 }
 
-export async function GetUsedDNSServer(req: Request): Promise<Response> {
+export async function GetUsedDNSServerEndpoint(req: Request): Promise<Response> {
   let resp = await cache.match(req)
   if (!resp) {
     let servers: DNSCRYPT_RESOLVERS[] | null = await KV.get('DoH_SERVERS', {
