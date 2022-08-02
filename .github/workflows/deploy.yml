@@ -3,10 +3,9 @@ name: Deploy
 on:
   push:
     branches:
-      - main
+      - "**"
     paths:
       - 'src/*'
-      - 'dist/*'
       - '.github/workflows/deploy.yml'
       - 'package.json'
     tags:
@@ -24,7 +23,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '16'
           cache: 'npm'
 
       - name: Install Dependencies
