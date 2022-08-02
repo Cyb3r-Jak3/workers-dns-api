@@ -119,7 +119,7 @@ export interface DsDatum {
 const WHOIS_INFO_KEY = 'WHOIS_INFO'
 
 // Get the full WHOIS registry list
-async function getWHOISInfo(): Promise<INANA_RESPONSE | null> {
+async function getWHOISInfo(KV: KVNamespace): Promise<INANA_RESPONSE | null> {
   let servers: INANA_RESPONSE | null = await KV.get(WHOIS_INFO_KEY, {
     type: 'json',
   })
@@ -138,10 +138,10 @@ async function getWHOISInfo(): Promise<INANA_RESPONSE | null> {
 }
 
 // Get the URL of the registry for a top level domain
-async function GetTLDContactURL(tld: string): Promise<string | null> {
+async function GetTLDContactURL(tld: string, KV: KVNamespace): Promise<string | null> {
   let contactURL = await KV.get(tld)
   if (!contactURL) {
-    const toParse = await getWHOISInfo()
+    const toParse = await getWHOISInfo(KV)
     if (!toParse) {
       return null
     }
@@ -160,6 +160,7 @@ async function GetTLDContactURL(tld: string): Promise<string | null> {
 async function GetRegistryRDAP(
   url: string,
   to_strip: string,
+  KV: KVNamespace
 ): Promise<RegistryRDAP | null> {
   const domain = CleanBase(url, to_strip)
   const tld = domain.split('.').at(-1)
@@ -169,7 +170,7 @@ async function GetRegistryRDAP(
     return null
     // return JSONResponse({Error: `Unable to get TLD for '${domain}`}, 400)
   }
-  const contactURL = await GetTLDContactURL(tld)
+  const contactURL = await GetTLDContactURL(tld, KV)
   if (!contactURL) {
     console.error('Did not get contact URL')
     return null
@@ -191,7 +192,7 @@ export async function WHOISEndpoint(c: Context): Promise<Response> {
   if (resp) {
     return HandleCachedResponse(resp)
   }
-  resp = JSONResponse(await getWHOISInfo(), 200, [['Cache-Control', '3600']])
+  resp = JSONResponse(await getWHOISInfo(c.env.KV), 200, [['Cache-Control', '3600']])
   await cache.put(c.req, resp.clone())
   return resp
 }
@@ -202,7 +203,7 @@ export async function RegistryInfoURLEndpoint(c: Context): Promise<Response> {
     return HandleCachedResponse(resp)
   }
   const tld = CleanBase(c.req.url, 'registry')
-  const contactURL = await GetTLDContactURL(tld)
+  const contactURL = await GetTLDContactURL(tld, c.env.KV)
   if (!contactURL) {
     resp = JSONResponse(
       {
@@ -225,7 +226,7 @@ export async function GetRegistryRDAPInfoEndpoint(
   if (resp) {
     return HandleCachedResponse(resp)
   }
-  const r = await GetRegistryRDAP(c.req.url, 'rdap/registry')
+  const r = await GetRegistryRDAP(c.req.url, 'rdap/registry', c.env.KV)
   if (!r) {
     return JSONErrorResponse('Error getting RDAP response data', 500)
   }
@@ -239,7 +240,7 @@ export async function GetRegistrarRDAPEndpoint(c: Context): Promise<Response> {
   if (resp) {
     return HandleCachedResponse(resp)
   }
-  const rdap_data = await GetRegistryRDAP(c.req.url, 'rdap/registrar')
+  const rdap_data = await GetRegistryRDAP(c.req.url, 'rdap/registrar', c.env.KV)
   if (!rdap_data) {
     return JSONErrorResponse('Error getting RDAP data')
   }
