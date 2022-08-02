@@ -1,4 +1,5 @@
-import { BASE } from './index'
+// import { BASE } from './index'
+
 export function JSONResponse(
   ResponseData: string | unknown,
   status = 200,
@@ -30,5 +31,23 @@ export const MiddlewareJSONCheck = (request: Request): Response | undefined => {
 }
 
 export function CleanBase(fullURL: string, stripPart: string): string {
-  return new URL(fullURL).pathname.replace(`${BASE}${stripPart}/`, '')
+  return new URL(fullURL).pathname.replace(`/${stripPart}/`, '')
+
+  // return new URL(fullURL).pathname.replace(`${BASE}${stripPart}/`, '')
+}
+
+/**
+ *
+ * @param resp Response that hit cache
+ * @returns Response with X-Worker-Cache Header
+ */
+
+export function HandleCachedResponse(resp: Response): Response {
+  const newHeaders = new Headers(resp.headers)
+  newHeaders.set('X-Worker-Cache', 'HIT')
+  return new Response(resp.body, {
+    status: resp.status,
+    statusText: resp.statusText,
+    headers: newHeaders,
+  })
 }

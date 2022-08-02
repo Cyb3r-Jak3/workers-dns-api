@@ -1,37 +1,50 @@
+import { Hono } from 'hono'
+import { logger } from 'hono/logger'
+
 import { queryEndpoint } from './dns-query'
 
-import { Router } from 'itty-router'
-import { MiddlewareJSONCheck } from './utils'
+// import { Router } from 'itty-router'
 import { DNSCryptInfoEndpoint, GetUsedDNSServerEndpoint } from './dns-servers'
-import { WHOISEndpoint, RegistryInfoURLEndpoint, GetRegistryRDAPInfoEndpoint, GetRegistrarRDAPEndpoint } from './whois'
+import {
+  WHOISEndpoint,
+  RegistryInfoURLEndpoint,
+  GetRegistryRDAPInfoEndpoint,
+  GetRegistrarRDAPEndpoint,
+} from './whois'
 
-export let BASE: string
+// export let BASE: string
 
-if (PRODUCTION === 'true') {
-  BASE = '/api/'
-} else {
-  BASE = '/'
+// if (PRODUCTION === 'true') {
+//   BASE = '/api/'
+// } else {
+//   BASE = '/'
+// }
+
+interface ENV {
+  KV: KVNamespace
+  PRODUCTION: 'false' | 'true'
 }
-const router = Router({ base: `${BASE}` })
 
-router.get('', () => {
+const app = new Hono<ENV>()
+
+app.use('*', logger())
+
+app.get('', () => {
   return new Response(
-    'Homepage for DNS API. The is the index page. Checkout the repo: https://github.com/Cyb3r-Jak3/workers-dns-api',
+    "'Landing page for DNS API. The is the index page. Checkout the repo: https://github.com/Cyb3r-Jak3/workers-dns-api'",
   )
 })
 
-router.get('nameservers/used', GetUsedDNSServerEndpoint)
+app.get('nameservers/used', GetUsedDNSServerEndpoint)
 
-router.get('nameservers/all', DNSCryptInfoEndpoint)
+app.get('nameservers/all', DNSCryptInfoEndpoint)
 
-router.get('query', MiddlewareJSONCheck, queryEndpoint)
-router.get('whois', WHOISEndpoint)
-router.get('registry/:tld', RegistryInfoURLEndpoint)
-router.get('rdap/registry/:domain', GetRegistryRDAPInfoEndpoint)
-router.get('rdap/registrar/:domain', GetRegistrarRDAPEndpoint)
+app.get('query', queryEndpoint)
+app.get('whois', WHOISEndpoint)
+app.get('registry/:tld', RegistryInfoURLEndpoint)
+app.get('rdap/registry/:domain', GetRegistryRDAPInfoEndpoint)
+app.get('rdap/registrar/:domain', GetRegistrarRDAPEndpoint)
 
-router.all('*', () => new Response('404, not found!', { status: 404 }))
+app.all('*', () => new Response('404, not found!', { status: 404 }))
 
-addEventListener('fetch', (e) => {
-  e.respondWith(router.handle(e.request))
-})
+export default app

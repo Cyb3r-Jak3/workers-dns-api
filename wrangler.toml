@@ -1,21 +1,13 @@
 name = "dns-api-dev"
-type = "javascript"
-zone_id = ""
-account_id = ""
+
 route = "dns.cyberjake.xyz/api/*"
 workers_dev = true
-compatibility_date = "2021-11-26"
+compatibility_date = "2022-07-31"
 kv_namespaces = [
     {binding = "KV", id = "4606ed33cd504ea99ebf3e212dc8e791", preview_id = "668bdc8b6b364db98a12dbf3c30cf48f"}
 ]
 
-webpack_config = "webpack.config.js"
-
-
-[build]
-command = "npm install && npm run build"
-[build.upload]
-format = "service-worker"
+main ="./src/index.ts"
 
 [vars]
 PRODUCTION = "false"
