@@ -138,7 +138,10 @@ async function getWHOISInfo(KV: KVNamespace): Promise<INANA_RESPONSE | null> {
 }
 
 // Get the URL of the registry for a top level domain
-async function GetTLDContactURL(tld: string, KV: KVNamespace): Promise<string | null> {
+async function GetTLDContactURL(
+  tld: string,
+  KV: KVNamespace,
+): Promise<string | null> {
   let contactURL = await KV.get(tld)
   if (!contactURL) {
     const toParse = await getWHOISInfo(KV)
@@ -160,7 +163,7 @@ async function GetTLDContactURL(tld: string, KV: KVNamespace): Promise<string | 
 async function GetRegistryRDAP(
   url: string,
   to_strip: string,
-  KV: KVNamespace
+  KV: KVNamespace,
 ): Promise<RegistryRDAP | null> {
   const domain = CleanBase(url, to_strip)
   const tld = domain.split('.').at(-1)
@@ -192,7 +195,9 @@ export async function WHOISEndpoint(c: Context): Promise<Response> {
   if (resp) {
     return HandleCachedResponse(resp)
   }
-  resp = JSONResponse(await getWHOISInfo(c.env.KV), 200, [['Cache-Control', '3600']])
+  resp = JSONResponse(await getWHOISInfo(c.env.KV), 200, [
+    ['Cache-Control', '3600'],
+  ])
   await cache.put(c.req, resp.clone())
   return resp
 }
