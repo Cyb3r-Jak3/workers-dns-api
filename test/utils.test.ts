@@ -46,7 +46,7 @@ describe('Middleware Check', () => {
   test('Fail check', async () => {
     const result = MiddlewareJSONCheck(new Request('/'))
     if (!result) {
-      throw new Error('Unable to get middleware check result')
+      throw new Error('Did not get middleware check result')
     }
     expect(result.status).toEqual(400)
   })
