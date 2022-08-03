@@ -4,7 +4,6 @@
   "description": "Cyb3r-Jak3 DNS API",
   "main": "dist/worker.js",
   "scripts": {
-    "build": "webpack",
     "format": "prettier --write  *.{json,js} src/**/*.{js,ts} test/**/*.{js,ts}",
     "lint": "eslint --max-warnings=0 src/**.{js,ts} && prettier --check *.{json,js} src/**/*.{js,ts} test/**/*.{js,ts}",
     "test": "jest --config jestconfig.json --verbose --coverage"
