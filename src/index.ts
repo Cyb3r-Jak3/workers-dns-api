@@ -1,25 +1,50 @@
+import { Hono } from 'hono'
+import { logger } from 'hono/logger'
+
 import { queryEndpoint } from './dns-query'
 
-import { Router } from 'itty-router'
-import { MiddlewareJSONCheck } from './utils'
-import { DNSCryptInfo, GetUsedDNSServer } from './dns-servers'
+// import { Router } from 'itty-router'
+import { DNSCryptInfoEndpoint, GetUsedDNSServerEndpoint } from './dns-servers'
+import {
+  WHOISEndpoint,
+  RegistryInfoURLEndpoint,
+  GetRegistryRDAPInfoEndpoint,
+  GetRegistrarRDAPEndpoint,
+} from './whois'
 
-const router = Router({ base: '/api' })
+// export let BASE: string
 
-router.get('/', () => {
+// if (PRODUCTION === 'true') {
+//   BASE = '/api/'
+// } else {
+//   BASE = '/'
+// }
+
+interface ENV {
+  KV: KVNamespace
+  PRODUCTION: 'false' | 'true'
+}
+
+const app = new Hono<ENV>()
+
+app.use('*', logger())
+
+app.get('', () => {
   return new Response(
-    'Homepage for DNS API. Nothing here right now but there are other endpoints. Checkout the repo: https://github.com/Cyb3r-Jak3/workers-dns-api',
+    "'Landing page for DNS API. The is the index page. Checkout the repo: https://github.com/Cyb3r-Jak3/workers-dns-api'",
   )
 })
 
-router.get('/nameservers/used', GetUsedDNSServer)
+app.get('nameservers/used', GetUsedDNSServerEndpoint)
 
-router.get('/nameservers/all', DNSCryptInfo)
+app.get('nameservers/all', DNSCryptInfoEndpoint)
 
-router.get('/query', MiddlewareJSONCheck, queryEndpoint)
+app.get('query', queryEndpoint)
+app.get('whois', WHOISEndpoint)
+app.get('registry/:tld', RegistryInfoURLEndpoint)
+app.get('rdap/registry/:domain', GetRegistryRDAPInfoEndpoint)
+app.get('rdap/registrar/:domain', GetRegistrarRDAPEndpoint)
 
-router.all('*', () => new Response('404, not found!', { status: 404 }))
+app.all('*', () => new Response('404, not found!', { status: 404 }))
 
-addEventListener('fetch', (e) => {
-  e.respondWith(router.handle(e.request))
-})
+export default app

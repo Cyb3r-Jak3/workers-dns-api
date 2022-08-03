@@ -16,7 +16,7 @@
       { "accessibility": "no-public" }
     ],
     "@typescript-eslint/no-require-imports": "error",
-    "@typescript-eslint/array-type": "error",
+    "@typescript-eslint/array-type": "off",
     "@typescript-eslint/await-thenable": "error",
     "@typescript-eslint/ban-ts-comment": "error",
     "camelcase": "off",

@@ -4,7 +4,6 @@
   "description": "Cyb3r-Jak3 DNS API",
   "main": "dist/worker.js",
   "scripts": {
-    "build": "webpack",
     "format": "prettier --write  *.{json,js} src/**/*.{js,ts} test/**/*.{js,ts}",
     "lint": "eslint --max-warnings=0 src/**.{js,ts} && prettier --check *.{json,js} src/**/*.{js,ts} test/**/*.{js,ts}",
     "test": "jest --config jestconfig.json --verbose --coverage"
@@ -19,26 +18,24 @@
     ]
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^3.2.0",
-    "@types/jest": "^27.4.1",
-    "@types/node": "^16.11.10",
+    "@cloudflare/workers-types": "^3.14.1",
+    "@types/jest": "^28.1.6",
+    "@types/node": "^18.6.3",
     "@types/service-worker-mock": "^2.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.16.1",
-    "@typescript-eslint/parser": "^4.33.0",
-    "eslint": "^7.21.0",
-    "eslint-config-prettier": "^8.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.32.0",
+    "@typescript-eslint/parser": "^5.32.0",
+    "eslint": "^8.21.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-config-typescript": "^3.0.0",
-    "jest": "^27.5.1",
-    "prettier": "^2.5.0",
+    "jest": "^28.1.3",
+    "prettier": "^2.7.1",
     "service-worker-mock": "^2.0.5",
-    "ts-jest": "^27.0.7",
+    "ts-jest": "^28.0.7",
     "ts-loader": "^9.2.6",
-    "typescript": "^4.5.2",
-    "webpack": "^5.69.1",
-    "webpack-cli": "^4.9.2",
-    "wrangler": "^2.0.23"
+    "typescript": "^4.7.4",
+    "wrangler": "^2.0.24"
   },
   "dependencies": {
-    "itty-router": "^2.4.5"
+    "hono": "^2.0.6"
   }
 }
