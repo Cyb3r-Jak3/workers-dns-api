@@ -256,7 +256,5 @@ export async function GetRegistrarRDAPEndpoint(c: Context): Promise<Response> {
     }
   }
   resp = JSONResponse(rdap_data, 404)
-  // const data: RegistryRDAP = await r.json()
-  // resp = JSONResponse(r)
   return resp
 }

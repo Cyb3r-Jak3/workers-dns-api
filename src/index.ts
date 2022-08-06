@@ -12,39 +12,42 @@ import {
   GetRegistrarRDAPEndpoint,
 } from './whois'
 
-// export let BASE: string
-
-// if (PRODUCTION === 'true') {
-//   BASE = '/api/'
-// } else {
-//   BASE = '/'
-// }
+export let BASE: string
 
 interface ENV {
   KV: KVNamespace
   PRODUCTION: 'false' | 'true'
 }
 
-const app = new Hono<ENV>()
+export default {
+  async fetch(request: Request, env: ENV, ctx: ExecutionContext) {
+    if (env.PRODUCTION === 'true') {
+      BASE = '/api/'
+    } else {
+      BASE = '/'
+    }
+    const app = new Hono<ENV>()
+    const route = new Hono()
+    route.use('*', logger())
 
-app.use('*', logger())
+    route.get('', () => {
+      return new Response(
+        'Landing page for DNS API. The is the index page. Checkout the repo: https://github.com/Cyb3r-Jak3/workers-dns-api',
+      )
+    })
 
-app.get('', () => {
-  return new Response(
-    "'Landing page for DNS API. The is the index page. Checkout the repo: https://github.com/Cyb3r-Jak3/workers-dns-api'",
-  )
-})
+    route.get('nameservers/used', GetUsedDNSServerEndpoint)
 
-app.get('nameservers/used', GetUsedDNSServerEndpoint)
+    route.get('nameservers/all', DNSCryptInfoEndpoint)
 
-app.get('nameservers/all', DNSCryptInfoEndpoint)
+    route.get('query', queryEndpoint)
+    route.get('whois', WHOISEndpoint)
+    route.get('registry/:tld', RegistryInfoURLEndpoint)
+    route.get('rdap/registry/:domain', GetRegistryRDAPInfoEndpoint)
+    route.get('rdap/registrar/:domain', GetRegistrarRDAPEndpoint)
 
-app.get('query', queryEndpoint)
-app.get('whois', WHOISEndpoint)
-app.get('registry/:tld', RegistryInfoURLEndpoint)
-app.get('rdap/registry/:domain', GetRegistryRDAPInfoEndpoint)
-app.get('rdap/registrar/:domain', GetRegistrarRDAPEndpoint)
-
-app.all('*', () => new Response('404, not found!', { status: 404 }))
-
-export default app
+    route.all('*', () => new Response('404, not found!', { status: 404 }))
+    app.route(BASE, route)
+    return app.fetch(request, env, ctx)
+  },
+}

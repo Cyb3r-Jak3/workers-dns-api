@@ -1,4 +1,4 @@
-// import { BASE } from './index'
+import { BASE } from './index'
 
 export function JSONResponse(
   ResponseData: string | unknown,
@@ -31,9 +31,9 @@ export const MiddlewareJSONCheck = (request: Request): Response | undefined => {
 }
 
 export function CleanBase(fullURL: string, stripPart: string): string {
-  return new URL(fullURL).pathname.replace(`/${stripPart}/`, '')
+  // return new URL(fullURL).pathname.replace(`/${stripPart}/`, '')
 
-  // return new URL(fullURL).pathname.replace(`${BASE}${stripPart}/`, '')
+  return new URL(fullURL).pathname.replace(`${BASE}${stripPart}/`, '')
 }
 
 /**
