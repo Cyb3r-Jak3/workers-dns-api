@@ -16,7 +16,7 @@ export async function GetUsedDNSServerEndpoint(c: Context): Promise<Response> {
   if (resp) {
     return HandleCachedResponse(resp)
   }
-  let servers: DNSCRYPT_RESOLVERS[] | null = await KV.get('DoH_SERVERS', {
+  let servers: DNSCRYPT_RESOLVERS[] | null = await c.env.KV.get('DoH_SERVERS', {
     type: 'json',
   })
   if (servers === null) {
@@ -28,7 +28,7 @@ export async function GetUsedDNSServerEndpoint(c: Context): Promise<Response> {
       }
     })
     servers = usedDNSServer
-    await KV.put('DoH_SERVERS', JSON.stringify(usedDNSServer), {
+    await c.env.KV.put('DoH_SERVERS', JSON.stringify(usedDNSServer), {
       expirationTtl: 86400,
     })
   }
